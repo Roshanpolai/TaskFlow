@@ -1,0 +1,192 @@
+:host {
+  display: block;
+}
+
+.task-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-xs);
+  cursor: grab;
+  user-select: none;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-color-focus);
+}
+
+.task-card:active {
+  cursor: grabbing;
+}
+
+/* Header */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.priority-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+}
+
+.priority-high {
+  background: var(--danger-light);
+  color: var(--danger-text);
+}
+.priority-high .priority-dot {
+  background: var(--danger);
+}
+
+.priority-medium {
+  background: var(--warning-light);
+  color: var(--warning-text);
+}
+.priority-medium .priority-dot {
+  background: var(--warning);
+}
+
+.priority-low {
+  background: var(--success-light);
+  color: var(--success-text);
+}
+.priority-low .priority-dot {
+  background: var(--success);
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.task-card:hover .card-actions {
+  opacity: 1;
+}
+
+.action-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+}
+
+.action-btn:hover {
+  background: var(--bg-surface-hover);
+}
+
+.edit-btn:hover {
+  color: var(--primary);
+}
+
+.delete-btn:hover {
+  color: var(--danger);
+  background: var(--danger-light);
+}
+
+/* Card Body */
+.card-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.35;
+  margin: 0;
+  word-break: break-word;
+}
+
+.completed-title {
+  color: var(--text-secondary);
+}
+
+.card-desc {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+/* Card Footer */
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color-subtle);
+}
+
+.due-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-surface-hover);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.due-badge.overdue {
+  color: var(--danger-text);
+  background: var(--danger-light);
+  font-weight: 600;
+}
+
+.due-badge.due-today {
+  color: var(--warning-text);
+  background: var(--warning-light);
+  font-weight: 600;
+}
+
+.due-badge.due-done {
+  color: var(--success-text);
+  background: var(--success-light);
+}
+
+.assignee-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px var(--bg-surface);
+  cursor: default;
+}

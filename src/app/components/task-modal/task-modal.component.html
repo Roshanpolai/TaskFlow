@@ -1,0 +1,175 @@
+@if (isOpen) {
+  <div class="modal-backdrop" (click)="onBackdropClick($event)" role="presentation">
+    <div class="modal-dialog" role="dialog" aria-modal="true" [attr.aria-label]="modalTitle">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="header-title-wrapper">
+          <div class="modal-icon">
+            @if (isEditMode) {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+            }
+          </div>
+          <div>
+            <h3 class="modal-title">{{ modalTitle }}</h3>
+            <p class="modal-subtitle">
+              {{ isEditMode ? 'Update task properties, assignee, and progress.' : 'Create a new task item and assign it to your team.' }}
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="close-btn"
+          (click)="attemptClose()"
+          aria-label="Close dialog"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Body / Form -->
+      <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="modal-form" novalidate>
+        <!-- Task Title -->
+        <div class="form-group">
+          <label for="task-title" class="form-label">
+            Task Title <span class="required">*</span>
+          </label>
+          <input
+            id="task-title"
+            type="text"
+            formControlName="title"
+            class="form-control"
+            [class.is-invalid]="(taskForm.get('title')?.touched || isSubmitted) && taskForm.get('title')?.invalid"
+            placeholder="e.g. Implement OAuth2 authentication flow"
+            autofocus
+          />
+          @if ((taskForm.get('title')?.touched || isSubmitted) && taskForm.get('title')?.errors?.['required']) {
+            <span class="error-text">Title is required.</span>
+          }
+          @if (taskForm.get('title')?.errors?.['maxlength']) {
+            <span class="error-text">Title cannot exceed 120 characters.</span>
+          }
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="task-desc" class="form-label">Description</label>
+          <textarea
+            id="task-desc"
+            formControlName="description"
+            class="form-control textarea"
+            rows="3"
+            placeholder="Add any helpful details, specifications, or links..."
+          ></textarea>
+        </div>
+
+        <!-- Grid: Status & Priority -->
+        <div class="form-row">
+          <div class="form-group col">
+            <label for="task-status" class="form-label">Status</label>
+            <select id="task-status" formControlName="status" class="form-control select-control">
+              <option value="todo">To Do</option>
+              <option value="in-progress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+          </div>
+
+          <div class="form-group col">
+            <label for="task-priority" class="form-label">Priority</label>
+            <select id="task-priority" formControlName="priority" class="form-control select-control">
+              <option value="low">Low Priority</option>
+              <option value="medium">Medium Priority</option>
+              <option value="high">High Priority</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Grid: Assignee & Due Date -->
+        <div class="form-row">
+          <div class="form-group col">
+            <label for="task-assignee" class="form-label">Assignee</label>
+            <div class="assignee-select-wrapper">
+              @if (selectedAssignee) {
+                <div
+                  class="selected-avatar-mini"
+                  [style.background-color]="selectedAssignee.avatarBg"
+                >
+                  {{ selectedAssignee.initials }}
+                </div>
+              }
+              <select id="task-assignee" formControlName="assigneeId" class="form-control select-control with-avatar">
+                @for (person of taskService.assignees(); track person.id) {
+                  <option [value]="person.id">{{ person.name }} ({{ person.role }})</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group col">
+            <label for="task-due-date" class="form-label">Due Date</label>
+            <input
+              id="task-due-date"
+              type="date"
+              formControlName="dueDate"
+              class="form-control"
+            />
+          </div>
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="modal-footer">
+          @if (isEditMode) {
+            <button
+              type="button"
+              class="btn btn-danger-ghost"
+              (click)="onDelete()"
+              title="Delete this task"
+            >
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd" />
+              </svg>
+              <span>Delete</span>
+            </button>
+          }
+
+          <div class="footer-spacer"></div>
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="attemptClose()"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+          >
+            {{ isEditMode ? 'Save Changes' : 'Create Task' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Discard changes dialog -->
+  <app-confirmation-dialog
+    [isOpen]="showDiscardConfirm"
+    title="Discard unsaved changes?"
+    message="You have unsaved modifications in this task. If you leave now, your changes will be lost."
+    confirmText="Discard Changes"
+    cancelText="Keep Editing"
+    [isDanger]="true"
+    (confirmed)="confirmDiscard()"
+    (cancelled)="cancelDiscard()"
+  ></app-confirmation-dialog>
+}

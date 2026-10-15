@@ -1,0 +1,178 @@
+<div class="app-layout">
+  <!-- Sidebar -->
+  <app-sidebar
+    [isOpen]="isSidebarOpen"
+    (closeSidebar)="closeSidebar()"
+  ></app-sidebar>
+
+  <!-- Mobile Drawer Backdrop -->
+  @if (isSidebarOpen) {
+    <div
+      class="sidebar-backdrop"
+      (click)="closeSidebar()"
+      role="presentation"
+    ></div>
+  }
+
+  <!-- Main View Area -->
+  <div class="main-wrapper">
+    <!-- Top Header Navigation -->
+    <app-header
+      (toggleSidebar)="toggleSidebar()"
+      (openCreateModal)="openCreateTaskModal()"
+    ></app-header>
+
+    <!-- Main Content Container -->
+    <main class="content-container">
+      <!-- Board Sub-header -->
+      <section class="board-subheader">
+        <div class="subheader-left">
+          <div class="project-pill">
+            <span class="pulse-dot"></span>
+            <span>Sprint 42</span>
+          </div>
+          <h2 class="board-title">Sprint Kanban Board</h2>
+          <span class="board-subtitle">Track, prioritize, and manage engineering tasks</span>
+        </div>
+
+        <!-- Filter Status Pills & Mobile Controls -->
+        <div class="subheader-right">
+          <!-- Status Filter Tabs -->
+          <div class="status-pills" role="tablist" aria-label="Status filters">
+            <button
+              type="button"
+              class="pill-btn"
+              [class.active]="taskService.filter().status === 'all'"
+              (click)="taskService.setFilter({ status: 'all' })"
+            >
+              All Tasks
+              <span class="pill-count">{{ taskService.stats().total }}</span>
+            </button>
+
+            <button
+              type="button"
+              class="pill-btn"
+              [class.active]="taskService.filter().status === 'todo'"
+              (click)="taskService.setFilter({ status: 'todo' })"
+            >
+              To Do
+              <span class="pill-count">{{ taskService.totalColumnCounts().todo }}</span>
+            </button>
+
+            <button
+              type="button"
+              class="pill-btn"
+              [class.active]="taskService.filter().status === 'in-progress'"
+              (click)="taskService.setFilter({ status: 'in-progress' })"
+            >
+              In Progress
+              <span class="pill-count">{{ taskService.totalColumnCounts()['in-progress'] }}</span>
+            </button>
+
+            <button
+              type="button"
+              class="pill-btn"
+              [class.active]="taskService.filter().status === 'done'"
+              (click)="taskService.setFilter({ status: 'done' })"
+            >
+              Done
+              <span class="pill-count">{{ taskService.totalColumnCounts().done }}</span>
+            </button>
+          </div>
+
+          <!-- Mobile Only Filter Dropdowns (< 1080px) -->
+          <div class="mobile-filters-bar">
+            <select
+              class="mobile-filter-select"
+              [value]="taskService.filter().priority"
+              (change)="onMobilePriorityChange($event)"
+              aria-label="Filter by priority"
+            >
+              <option value="all">All Priorities</option>
+              <option value="high">High Priority</option>
+              <option value="medium">Medium Priority</option>
+              <option value="low">Low Priority</option>
+            </select>
+
+            <select
+              class="mobile-filter-select"
+              [value]="taskService.filter().assigneeId"
+              (change)="onMobileAssigneeChange($event)"
+              aria-label="Filter by assignee"
+            >
+              <option value="all">All Assignees</option>
+              @for (person of taskService.assignees(); track person.id) {
+                <option [value]="person.id">{{ person.name }}</option>
+              }
+            </select>
+
+            @if (taskService.isFilterActive()) {
+              <button
+                type="button"
+                class="mobile-clear-btn"
+                (click)="taskService.clearFilters()"
+                title="Clear filters"
+              >
+                Clear
+              </button>
+            }
+          </div>
+        </div>
+      </section>
+
+      <!-- Active Filters Warning Pill if filtered -->
+      @if (taskService.isFilterActive()) {
+        <div class="active-filter-banner">
+          <div class="banner-text">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+              <path fill-rule="evenodd" d="M2.628 1.601C5.028 1.206 7.49 1 10 1s4.973.206 7.372.601a.75.75 0 01.628.74v2.288a2.25 2.25 0 01-.659 1.59l-4.682 4.683a2.25 2.25 0 00-.659 1.59v3.037c0 .684-.31 1.33-.844 1.757l-1.937 1.55A.75.75 0 018 18.25v-5.757a2.25 2.25 0 00-.659-1.591L2.659 6.22A2.25 2.25 0 012 4.629V2.34a.75.75 0 01.628-.74z" clip-rule="evenodd" />
+            </svg>
+            <span>Showing filtered results ({{ taskService.filteredTasks().length }} of {{ taskService.stats().total }} tasks)</span>
+          </div>
+          <button
+            type="button"
+            class="banner-clear-btn"
+            (click)="taskService.clearFilters()"
+          >
+            Reset Filters
+          </button>
+        </div>
+      }
+
+      <!-- Dynamic Dashboard Statistics -->
+      <app-dashboard-stats></app-dashboard-stats>
+
+      <!-- Kanban Columns Drag & Drop Board -->
+      <app-kanban-board
+        (createTaskInColumn)="openCreateTaskModal($event)"
+        (editTask)="openEditTaskModal($event)"
+        (deleteTask)="requestDeleteTask($event)"
+      ></app-kanban-board>
+    </main>
+  </div>
+
+  <!-- Reusable Task Create/Edit Modal -->
+  <app-task-modal
+    [isOpen]="isTaskModalOpen"
+    [task]="selectedTaskForEdit"
+    [defaultStatus]="defaultStatusForNewTask"
+    (saveTask)="handleSaveTask($event)"
+    (deleteTask)="requestDeleteTask($event)"
+    (closeModal)="closeTaskModal()"
+  ></app-task-modal>
+
+  <!-- Delete Task Confirmation Dialog -->
+  <app-confirmation-dialog
+    [isOpen]="!!taskToDelete"
+    title="Delete Task?"
+    [message]="'Are you sure you want to permanently delete task &quot;' + (taskToDelete?.title || '') + '&quot;? This cannot be undone.'"
+    confirmText="Delete Task"
+    cancelText="Cancel"
+    [isDanger]="true"
+    (confirmed)="confirmDeleteTask()"
+    (cancelled)="cancelDeleteTask()"
+  ></app-confirmation-dialog>
+
+  <!-- Toast Notifications Host -->
+  <app-toast></app-toast>
+</div>

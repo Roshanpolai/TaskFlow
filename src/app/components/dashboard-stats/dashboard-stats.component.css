@@ -1,0 +1,144 @@
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-xs);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  user-select: none;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-color-focus);
+}
+
+.stat-card.active-filter {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.stat-icon-wrapper {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon-total {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.icon-progress {
+  background: var(--info-light);
+  color: var(--info);
+}
+
+.icon-done {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.icon-overdue {
+  background: var(--warning-light);
+  color: var(--warning);
+}
+
+.has-overdue .icon-overdue {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.stat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.stat-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.stat-number {
+  font-family: var(--font-family-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.stat-number.danger-num {
+  color: var(--danger);
+}
+
+.stat-percentage {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--info-text);
+  background: var(--info-light);
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+}
+
+.stat-percentage.completion {
+  color: var(--success-text);
+  background: var(--success-light);
+}
+
+.stat-badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-hover);
+  color: var(--text-secondary);
+}
+
+.stat-badge.overdue-badge {
+  background: var(--danger-light);
+  color: var(--danger-text);
+  font-weight: 700;
+}
+
+.stat-badge.on-track {
+  background: var(--success-light);
+  color: var(--success-text);
+}

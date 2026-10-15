@@ -1,0 +1,78 @@
+<div class="kanban-container" cdkDropListGroup>
+  @for (col of columns; track col.id) {
+    <div class="kanban-column" [attr.data-column]="col.id">
+      <!-- Column Header -->
+      <div class="column-header">
+        <div class="column-title-group">
+          <span class="column-dot" [style.background-color]="col.dotColor"></span>
+          <h3 class="column-title">{{ col.title }}</h3>
+          <span class="column-count-badge">
+            {{ getTasksForColumn(col.id).length }}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          class="add-task-btn"
+          (click)="onAddClick(col.id)"
+          [title]="'Add task to ' + col.title"
+          aria-label="Add task"
+        >
+          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+            <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Column Drop Zone -->
+      <div
+        class="column-cards-list"
+        [id]="'col-' + col.id"
+        cdkDropList
+        [cdkDropListData]="getTasksForColumn(col.id)"
+        [cdkDropListConnectedTo]="getConnectedTo()"
+        (cdkDropListDropped)="onDrop($event, col.id)"
+      >
+        @for (task of getTasksForColumn(col.id); track task.id) {
+          <app-task-card
+            [task]="task"
+            (editTask)="onEdit($event)"
+            (deleteTask)="onDelete($event)"
+          ></app-task-card>
+        }
+
+        <!-- Empty State -->
+        @if (getTasksForColumn(col.id).length === 0) {
+          <div class="column-empty-state">
+            <div class="empty-icon">
+              @if (taskService.isFilterActive()) {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" width="28" height="28">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" width="28" height="28">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+              }
+            </div>
+            <p class="empty-title">
+              {{ taskService.isFilterActive() ? 'No matching tasks' : 'No tasks yet' }}
+            </p>
+            <p class="empty-sub">
+              {{ taskService.isFilterActive() ? 'Try adjusting your filters' : 'Drop a card or click + to add' }}
+            </p>
+            @if (!taskService.isFilterActive()) {
+              <button
+                type="button"
+                class="empty-add-btn"
+                (click)="onAddClick(col.id)"
+              >
+                + Add Task
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

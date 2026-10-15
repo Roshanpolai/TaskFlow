@@ -1,0 +1,153 @@
+<aside class="sidebar" [class.open]="isOpen">
+  <!-- Brand / Logo -->
+  <div class="sidebar-header">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
+          <rect x="3" y="3" width="7" height="13" rx="2" fill="currentColor" fill-opacity="0.9"/>
+          <rect x="14" y="3" width="7" height="7" rx="2" fill="currentColor"/>
+          <rect x="14" y="14" width="7" height="7" rx="2" fill="currentColor" fill-opacity="0.6"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1 class="brand-name">TaskFlow</h1>
+        <span class="brand-tag">Project Board</span>
+      </div>
+    </div>
+
+    <!-- Mobile Close Button -->
+    <button
+      type="button"
+      class="mobile-close-btn"
+      (click)="onClose()"
+      aria-label="Close sidebar navigation"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="sidebar-content">
+    <!-- Navigation Links -->
+    <nav class="nav-section" aria-label="Main Navigation">
+      <div class="nav-title">WORKSPACE</div>
+      <ul class="nav-list">
+        <li>
+          <button
+            type="button"
+            class="nav-link"
+            [class.active]="taskService.filter().status === 'all' && !taskService.isFilterActive()"
+            (click)="taskService.clearFilters()"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+              <rect x="3" y="3" width="7" height="9" rx="1" />
+              <rect x="14" y="3" width="7" height="5" rx="1" />
+              <rect x="14" y="12" width="7" height="9" rx="1" />
+              <rect x="3" y="16" width="7" height="5" rx="1" />
+            </svg>
+            <span>Kanban Board</span>
+            <span class="nav-badge">{{ taskService.stats().total }}</span>
+          </button>
+        </li>
+
+        <li>
+          <button
+            type="button"
+            class="nav-link"
+            [class.active]="taskService.filter().status === 'in-progress'"
+            (click)="taskService.setFilter({ status: 'in-progress' })"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <span>In Progress</span>
+            <span class="nav-badge info-badge">{{ taskService.stats().inProgress }}</span>
+          </button>
+        </li>
+
+        <li>
+          <button
+            type="button"
+            class="nav-link"
+            [class.active]="taskService.filter().status === 'done'"
+            (click)="taskService.setFilter({ status: 'done' })"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Done Archive</span>
+            <span class="nav-badge success-badge">{{ taskService.stats().done }}</span>
+          </button>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Team Members Section -->
+    <div class="team-section">
+      <div class="nav-title">TEAM MEMBERS</div>
+      <div class="team-list">
+        @for (member of taskService.assignees(); track member.id) {
+          <button
+            type="button"
+            class="team-member-btn"
+            [class.active-member]="taskService.filter().assigneeId === member.id"
+            (click)="taskService.setFilter({ assigneeId: taskService.filter().assigneeId === member.id ? 'all' : member.id })"
+            [title]="'Filter by ' + member.name"
+          >
+            <div class="member-avatar" [style.background-color]="member.avatarBg">
+              {{ member.initials }}
+            </div>
+            <div class="member-info">
+              <span class="member-name">{{ member.name }}</span>
+              <span class="member-role">{{ member.role }}</span>
+            </div>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Progress Card -->
+    <div class="progress-card">
+      <div class="progress-header">
+        <span class="progress-title">Sprint Completion</span>
+        <span class="progress-percent">{{ completionPercentage }}%</span>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" [style.width.%]="completionPercentage"></div>
+      </div>
+      <div class="progress-sub">
+        <span>{{ taskService.stats().done }} of {{ taskService.stats().total }} completed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar Footer -->
+  <div class="sidebar-footer">
+    <button
+      type="button"
+      class="reset-btn"
+      (click)="onRequestReset()"
+      title="Restore initial sample tasks"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+      <span>Reset Demo Data</span>
+    </button>
+    <div class="footer-meta">TaskFlow v1.0 • Angular 21</div>
+  </div>
+</aside>
+
+<!-- Reset confirmation dialog -->
+<app-confirmation-dialog
+  [isOpen]="showResetConfirm"
+  title="Reset to Demo Data?"
+  message="This will overwrite any current changes and restore the default sample tasks and sprint board state. Are you sure?"
+  confirmText="Reset All Data"
+  cancelText="Keep Current Data"
+  [isDanger]="true"
+  (confirmed)="confirmReset()"
+  (cancelled)="cancelReset()"
+></app-confirmation-dialog>

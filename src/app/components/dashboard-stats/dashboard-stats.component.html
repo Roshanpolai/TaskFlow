@@ -1,0 +1,105 @@
+<div class="stats-grid">
+  <!-- Total Tasks -->
+  <div
+    class="stat-card"
+    [class.active-filter]="taskService.filter().status === 'all' && !taskService.isFilterActive()"
+    (click)="filterByStatus('all')"
+    role="button"
+    tabindex="0"
+    title="Click to view all tasks"
+  >
+    <div class="stat-icon-wrapper icon-total">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+      </svg>
+    </div>
+    <div class="stat-content">
+      <span class="stat-label">Total Tasks</span>
+      <div class="stat-value-row">
+        <span class="stat-number">{{ taskService.stats().total }}</span>
+        <span class="stat-badge">Active</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- In Progress -->
+  <div
+    class="stat-card"
+    [class.active-filter]="taskService.filter().status === 'in-progress'"
+    (click)="filterByStatus('in-progress')"
+    role="button"
+    tabindex="0"
+    title="Filter by In Progress"
+  >
+    <div class="stat-icon-wrapper icon-progress">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+    <div class="stat-content">
+      <span class="stat-label">In Progress</span>
+      <div class="stat-value-row">
+        <span class="stat-number">{{ taskService.stats().inProgress }}</span>
+        @if (taskService.stats().total > 0) {
+          <span class="stat-percentage">
+            {{ ((taskService.stats().inProgress / taskService.stats().total) * 100) | number:'1.0-0' }}%
+          </span>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Completed -->
+  <div
+    class="stat-card"
+    [class.active-filter]="taskService.filter().status === 'done'"
+    (click)="filterByStatus('done')"
+    role="button"
+    tabindex="0"
+    title="Filter by Completed"
+  >
+    <div class="stat-icon-wrapper icon-done">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+    <div class="stat-content">
+      <span class="stat-label">Completed</span>
+      <div class="stat-value-row">
+        <span class="stat-number">{{ taskService.stats().done }}</span>
+        @if (taskService.stats().total > 0) {
+          <span class="stat-percentage completion">
+            {{ ((taskService.stats().done / taskService.stats().total) * 100) | number:'1.0-0' }}%
+          </span>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Overdue -->
+  <div
+    class="stat-card"
+    [class.has-overdue]="taskService.stats().overdue > 0"
+    role="region"
+    title="Tasks past their due date and not done"
+  >
+    <div class="stat-icon-wrapper icon-overdue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+    </div>
+    <div class="stat-content">
+      <span class="stat-label">Overdue</span>
+      <div class="stat-value-row">
+        <span class="stat-number" [class.danger-num]="taskService.stats().overdue > 0">
+          {{ taskService.stats().overdue }}
+        </span>
+        @if (taskService.stats().overdue > 0) {
+          <span class="stat-badge overdue-badge">Needs Action</span>
+        } @else {
+          <span class="stat-badge on-track">On Track</span>
+        }
+      </div>
+    </div>
+  </div>
+</div>
